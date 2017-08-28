@@ -19,7 +19,7 @@ bool savePlots = false;
 const int REBINF = 8;
 
 //Reject points near peak for fit?
-bool reject = !true;
+bool reject = true;
 
 //Reject sparse bins?
 bool rejectSparse = !true;
@@ -33,11 +33,11 @@ int cocktailNumber = 82717;
 //Limits for fitting data CDPHI
 const float FIT_LOW = -0.15;
 const float FIT_HIGH = 0.15;
-const float EXCLUDE_LOW = -0.05;
-const float EXCLUDE_HIGH = 0.015;
+const float EXCLUDE_LOW = -0.03;
+const float EXCLUDE_HIGH = 0.005;
 
 //pT bin to compute FNP
-int pTBin = 2;
+int pTBin = 5;
 
 float pTLow = -9999;
 float pTHigh = -9999;
@@ -355,8 +355,8 @@ void removeSwappedBackground()
 	h_cdphi_data_electrons_inclusive_B0 = (TH1D*) h_cdphi_data_electrons_B0->Clone("h_cdphi_data_electrons_inclusive_B0");
 	h_cdphi_data_electrons_inclusive_B1 = (TH1D*) h_cdphi_data_electrons_B1->Clone("h_cdphi_data_electrons_inclusive_B1");
 
-	h_cdphi_data_electrons_inclusive_B0->Add(h_cdphi_data_electrons_swapped_B0, -1.0);
-	h_cdphi_data_electrons_inclusive_B1->Add(h_cdphi_data_electrons_swapped_B1, -1.0);
+	//h_cdphi_data_electrons_inclusive_B0->Add(h_cdphi_data_electrons_swapped_B0, -1.0);
+	//h_cdphi_data_electrons_inclusive_B1->Add(h_cdphi_data_electrons_swapped_B1, -1.0);
 }
 
 
@@ -366,7 +366,7 @@ void removeSwappedBackground()
 void getNumTracks()
 {
 	//Number of inclusive electrons = number of measured electron tracks - number of swapped electron tracks
-	numInclusiveElectronsB0 = h_ntracks_electrons->Integral() - h_ntracks_swapped->Integral();
+	numInclusiveElectronsB0 = h_ntracks_electrons->Integral();// - h_ntracks_swapped->Integral();
 	numInclusiveElectronsB1 = numInclusiveElectronsB0;
 
 	//Number of photonic electrons
@@ -717,7 +717,7 @@ void fitPhotonicSideband()
 	float fitHighPos = 0.15;
 	float fitLowPos = 0.02;
 
-	float fitHighNeg = -0.01;
+	float fitHighNeg = -0.015;
 	float fitLowNeg = -0.15;
 
 	//----------B0-------------
@@ -735,10 +735,10 @@ void fitPhotonicSideband()
 	{
 		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
 
-		f_pos_cdphi_B0->SetParameter(0, h_cdphi_cocktail_B0_copy->GetMaximum());
+		f_pos_cdphi_B0->SetParameter(0, 7.63E8);
 		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
-		f_pos_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
-		f_pos_cdphi_B0->SetParameter(3, -3.81166e+00);
+		f_pos_cdphi_B0->SetParameter(2, 4.62747);
+		f_pos_cdphi_B0->SetParameter(3, 79.7595);
 	}
 	else if (pTBin == 4)
 	{
@@ -751,11 +751,11 @@ void fitPhotonicSideband()
 	}
 	else if (pTBin == 5)
 	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "1.2*[0]*TMath::Exp([1]*x) + 1.2*[2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-		f_pos_cdphi_B0->FixParameter(0, 2.24691e+07);
-		f_pos_cdphi_B0->FixParameter(1, -7.68560e+01);
-		f_pos_cdphi_B0->FixParameter(2, 5.12410e+05);
-		f_pos_cdphi_B0->FixParameter(3, -1.64956e+01);
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+		f_pos_cdphi_B0->SetParameter(0, 2.24691e+07);
+		f_pos_cdphi_B0->SetParameter(1, -7.68560e+01);
+		f_pos_cdphi_B0->SetParameter(2, 5.12410e+05);
+		f_pos_cdphi_B0->SetParameter(3, -1.64956e+01);
 	}
 	else if (pTBin == 6)
 	{
@@ -774,16 +774,11 @@ void fitPhotonicSideband()
 
 	if (pTBin == 2)
 	{
+		f_neg_cdphi_B0 = new TF1("f_neg_cdphi_B0", "1.5*([0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x))", fitLowNeg, fitHighNeg);
 		f_neg_cdphi_B0->FixParameter(0, 0.0);
 		f_neg_cdphi_B0->FixParameter(1, 75.53);
 		f_neg_cdphi_B0->FixParameter(2, 4.22E8);
 		f_neg_cdphi_B0->FixParameter(3, 48.45);
-		/*
-		f_neg_cdphi_B0->SetParameter(0, 2.94E09);
-		f_neg_cdphi_B0->SetParameter(1, 345.8);
-		f_neg_cdphi_B0->SetParameter(2, 1E09);
-		f_neg_cdphi_B0->SetParameter(3, 33.4);
-		*/
 	}
 	else if (pTBin == 3)
 	{
@@ -813,7 +808,7 @@ void fitPhotonicSideband()
 		f_neg_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
 		f_neg_cdphi_B0->SetParameter(3, 2.80063e+01);
 	}
-	h_cdphi_cocktail_B0_copy->Fit(f_neg_cdphi_B0, "R");
+	h_cdphi_cocktail_B0_copy->Fit(f_neg_cdphi_B0, "Q0R");
 
 
 	//----------B1-------------
@@ -828,10 +823,10 @@ void fitPhotonicSideband()
 	}
 	else if (pTBin == 3)
 	{
-		f_pos_cdphi_B1->FixParameter(0, 6.89994e+08);
-		f_pos_cdphi_B1->FixParameter(1, -23.0516);
-		f_pos_cdphi_B1->FixParameter(2, 3.23243e+09);
-		f_pos_cdphi_B1->FixParameter(3, -56.2);
+		f_pos_cdphi_B1->SetParameter(0, 6.89994e+08);
+		f_pos_cdphi_B1->SetParameter(1, -23.0516);
+		f_pos_cdphi_B1->SetParameter(2, 3.23243e+09);
+		f_pos_cdphi_B1->SetParameter(3, -56.2);
 	}
 	else if (pTBin == 4)
 	{
@@ -864,10 +859,10 @@ void fitPhotonicSideband()
 
 	if (pTBin == 2)
 	{
-		f_neg_cdphi_B1->SetParameter(0, h_cdphi_cocktail_B1_copy->GetMaximum());
-		f_neg_cdphi_B1->SetParameter(1, 7.85768e+01);
-		f_neg_cdphi_B1->SetParameter(2, h_cdphi_cocktail_B1_copy->GetMaximum());
-		f_neg_cdphi_B1->SetParameter(3, 3.49565e+00);
+		f_neg_cdphi_B1->SetParameter(0, 1.135E8);
+		f_neg_cdphi_B1->SetParameter(1, 45.34);
+		f_neg_cdphi_B1->SetParameter(2, 43375.8);
+		f_neg_cdphi_B1->SetParameter(3, -12.0705);
 	}
 	else if (pTBin == 3)
 	{
@@ -1117,7 +1112,7 @@ void constructMultiplicityBackground()
 	long int numExtraClusB0 = 0;
 	long int numExtraClusB1 = 0;
 
-	if (pTBin < 3)
+	if (pTBin < 4)
 	{
 		numExtraClusB0 = TMath::Floor(numClusterPerHadronTrackB0 * numPhotonicElectrons / 100);
 		numExtraClusB1 = TMath::Floor(numClusterPerHadronTrackB1 * numPhotonicElectrons / 100);
@@ -1141,7 +1136,7 @@ void constructMultiplicityBackground()
 		float cdphi = f_multiplicitybackground_B0->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B0->GetRandom();
 		int bin = h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(cdphi);
 
-		if (pTBin < 3)
+		if (pTBin < 4)
 		{
 			h_cdphi_cocktail_multback_B0->SetBinContent(bin, h_cdphi_cocktail_multback_B0->GetBinContent(bin) + 100.0);
 		}
@@ -1161,7 +1156,7 @@ void constructMultiplicityBackground()
 		float cdphi = f_multiplicitybackground_B1->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B1->GetRandom();
 		int bin = h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(cdphi);
 
-		if (pTBin < 3)
+		if (pTBin < 4)
 		{
 			h_cdphi_cocktail_multback_B1->SetBinContent(bin, h_cdphi_cocktail_multback_B1->GetBinContent(bin) + 100.0);
 		}

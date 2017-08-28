@@ -37,7 +37,7 @@ const float EXCLUDE_LOW = -0.03;
 const float EXCLUDE_HIGH = 0.005;
 
 //pT bin to compute FNP
-int pTBin = 5;
+int pTBin = 2;
 
 float pTLow = -9999;
 float pTHigh = -9999;
@@ -724,12 +724,17 @@ void fitPhotonicSideband()
 
 	if (pTBin == 2)
 	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "0.97*([0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x))", fitLowPos, fitHighPos);
 
-		f_pos_cdphi_B0->SetParameter(0, 8.62982e+09);
-		f_pos_cdphi_B0->SetParameter(1, -4.65486e+01);
-		f_pos_cdphi_B0->SetParameter(2, 2.33832e+09);
-		f_pos_cdphi_B0->SetParameter(3, -2.04280e+01);
+		//f_pos_cdphi_B0->SetParameter(0, 8.62982e+09);
+		//f_pos_cdphi_B0->SetParameter(1, -4.65486e+01);
+		//f_pos_cdphi_B0->SetParameter(2, 2.33832e+09);
+		//f_pos_cdphi_B0->SetParameter(3, -2.04280e+01);
+		//The seeded parameters above lead to the following parameters
+		f_pos_cdphi_B0->FixParameter(0, 6.13712e+09);
+		f_pos_cdphi_B0->FixParameter(1, -5.53696e+01);
+		f_pos_cdphi_B0->FixParameter(2, 5.54047e+08);
+		f_pos_cdphi_B0->FixParameter(3, -1.85779e+01);
 	}
 	else if (pTBin == 3)
 	{
@@ -858,11 +863,12 @@ void fitPhotonicSideband()
 	f_neg_cdphi_B1 = new TF1("f_neg_cdphi_B1", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowNeg, fitHighNeg);
 
 	if (pTBin == 2)
-	{
-		f_neg_cdphi_B1->SetParameter(0, 1.135E8);
-		f_neg_cdphi_B1->SetParameter(1, 45.34);
-		f_neg_cdphi_B1->SetParameter(2, 43375.8);
-		f_neg_cdphi_B1->SetParameter(3, -12.0705);
+	{		
+		f_neg_cdphi_B1->SetParameter(0, 1.56974e+08);
+		f_neg_cdphi_B1->SetParameter(1, 5.77122e+01);
+		f_neg_cdphi_B1->SetParameter(2, 1.74885e+06 );
+		f_neg_cdphi_B1->SetParameter(3, 13.1068);
+
 	}
 	else if (pTBin == 3)
 	{
@@ -893,7 +899,7 @@ void fitPhotonicSideband()
 		f_neg_cdphi_B1->SetParameter(3, 3.49565e+00);
 	}
 
-	h_cdphi_cocktail_B1_copy->Fit(f_neg_cdphi_B1, "Q0R");
+	h_cdphi_cocktail_B1_copy->Fit(f_neg_cdphi_B1, "R");
 
 
 	//Make a copy of photonic cdphi before smoothing out the tails
@@ -1175,6 +1181,7 @@ void plotClustersPerHadronTrack()
 	h_cdphi_cluspertrack_hadrons_B0->SetTitle("");
 	h_cdphi_cluspertrack_hadrons_B0->GetYaxis()->SetTitle("Clusters per Track");
 	h_cdphi_cluspertrack_hadrons_B0->GetYaxis()->SetTitleOffset(1.3);
+	h_cdphi_cluspertrack_hadrons_B0->GetXaxis()->SetRangeUser(FIT_LOW, FIT_HIGH);
 	h_cdphi_cluspertrack_hadrons_B0->Draw();
 	f_multiplicitybackground_B0->Draw("same");
 
@@ -1198,6 +1205,7 @@ void plotClustersPerHadronTrack()
 	h_cdphi_cluspertrack_hadrons_B1->SetTitle("");
 	h_cdphi_cluspertrack_hadrons_B1->GetYaxis()->SetTitle("Clusters per Track");
 	h_cdphi_cluspertrack_hadrons_B1->GetYaxis()->SetTitleOffset(1.3);
+	h_cdphi_cluspertrack_hadrons_B1->GetXaxis()->SetRangeUser(FIT_LOW, FIT_HIGH);
 	h_cdphi_cluspertrack_hadrons_B1->Draw();
 	f_multiplicitybackground_B1->Draw("same");
 
@@ -1243,36 +1251,6 @@ void normalizeHistograms()
 		double error = h_cdphi_cocktail_multback_B1->GetBinError(i);
 		h_cdphi_cocktail_multback_B1_errors->SetBinContent(i, error);
 	}
-
-	//for (int i = 1; i <= h_cdphi_cocktail_multback_B0->GetNbinsX(); i++)
-	//{
-	//  cout << h_cdphi_cocktail_multback_B0->GetBinError(i) << endl;
-	//}
-
-	//Normalize to the same area in the tails
-	float cocktail_multback_B0_tailarea = h_cdphi_cocktail_multback_B0->Integral(h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(FIT_LOW), h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(-0.1));
-	//cocktail_multback_B0_tailarea += h_cdphi_cocktail_multback_B0->Integral(h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(0.1), h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(FIT_HIGH));
-
-	float cocktail_multback_B1_tailarea = h_cdphi_cocktail_multback_B1->Integral(h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(FIT_LOW), h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(-0.1));
-	//cocktail_multback_B1_tailarea += h_cdphi_cocktail_multback_B1->Integral(h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(0.1), h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(FIT_HIGH));
-
-	float data_hadrons_B0_tailarea = h_cdphi_data_hadrons_B0->Integral(h_cdphi_data_hadrons_B0->GetXaxis()->FindBin(FIT_LOW), h_cdphi_data_hadrons_B0->GetXaxis()->FindBin(-0.1));
-	//data_hadrons_B0_tailarea += h_cdphi_data_hadrons_B0->Integral(h_cdphi_data_hadrons_B0->GetXaxis()->FindBin(0.1), h_cdphi_data_hadrons_B0->GetXaxis()->FindBin(FIT_HIGH));
-
-	float data_hadrons_B1_tailarea = h_cdphi_data_hadrons_B1->Integral(h_cdphi_data_hadrons_B1->GetXaxis()->FindBin(FIT_LOW), h_cdphi_data_hadrons_B1->GetXaxis()->FindBin(-0.1));
-	//data_hadrons_B1_tailarea += h_cdphi_data_hadrons_B1->Integral(h_cdphi_data_hadrons_B1->GetXaxis()->FindBin(0.1), h_cdphi_data_hadrons_B1->GetXaxis()->FindBin(FIT_HIGH));
-
-	h_cdphi_cocktail_multback_B0_tailnorm = (TH1D*) h_cdphi_cocktail_multback_B0->Clone("h_cdphi_cocktail_multback_B0_tailnorm");
-	h_cdphi_cocktail_multback_B1_tailnorm = (TH1D*) h_cdphi_cocktail_multback_B1->Clone("h_cdphi_cocktail_multback_B1_tailnorm");
-
-	h_cdphi_data_hadrons_B0_tailnorm = (TH1D*) h_cdphi_data_hadrons_B0->Clone("h_cdphi_data_hadrons_B0_tailnorm");
-	h_cdphi_data_hadrons_B1_tailnorm = (TH1D*) h_cdphi_data_hadrons_B1->Clone("h_cdphi_data_hadrons_B1_tailnorm");
-
-	h_cdphi_cocktail_multback_B0_tailnorm->Scale(1.0 / cocktail_multback_B0_tailarea);
-	h_cdphi_cocktail_multback_B1_tailnorm->Scale(1.0 / cocktail_multback_B1_tailarea);
-
-	h_cdphi_data_hadrons_B0_tailnorm->Scale(1.0 / data_hadrons_B0_tailarea);
-	h_cdphi_data_hadrons_B1_tailnorm->Scale(1.0 / data_hadrons_B1_tailarea);
 }
 
 
@@ -1306,19 +1284,19 @@ void plotFitComponents()
 	h_cdphi_data_electrons_inclusive_B0->SetMarkerStyle(20);
 	h_cdphi_data_electrons_inclusive_B0->SetMarkerSize(0.5);
 	h_cdphi_data_electrons_inclusive_B0->SetLineColor(kBlack);
-	h_cdphi_cocktail_multback_B0->SetLineColor(kBlue);
-	h_cdphi_data_hadrons_B0->SetLineColor(kOrange + 7);
+	h_cdphi_cocktail_multback_B0_scaled->SetLineColor(kBlue);
+	h_cdphi_data_hadrons_B0_scaled->SetLineColor(kOrange + 7);
 
 	h_cdphi_data_electrons_inclusive_B0->GetYaxis()->SetTitle("Clusters per Track");
 	h_cdphi_data_electrons_inclusive_B0->Draw();
-	h_cdphi_cocktail_multback_B0->Draw("hist,same");
-	h_cdphi_data_hadrons_B0->Draw("hist,same");
+	h_cdphi_cocktail_multback_B0_scaled->Draw("hist,same");
+	h_cdphi_data_hadrons_B0_scaled->Draw("hist,same");
 
 	TLegend *legB0 = new TLegend(FIT_HIGH, 0.6, 0.65, 0.8);
 	legB0->SetLineColor(kWhite);
 	legB0->AddEntry(h_cdphi_data_electrons_inclusive_B0, "Inclusive Electrons - Swapped Electrons", "P");
-	legB0->AddEntry(h_cdphi_cocktail_multback_B0, "Photonic Component with HM Background", "L");
-	legB0->AddEntry(h_cdphi_data_hadrons_B0, "Non-Photonic Background", "L");
+	legB0->AddEntry(h_cdphi_cocktail_multback_B0_scaled, "Photonic Component with HM Background", "L");
+	legB0->AddEntry(h_cdphi_data_hadrons_B0_scaled, "Non-Photonic Background", "L");
 	legB0->Draw("same");
 
 	TLatex *tlB0 = new TLatex(0.68, 0.73, "B0");
@@ -1337,14 +1315,14 @@ void plotFitComponents()
 
 	h_cdphi_data_electrons_inclusive_B1->GetYaxis()->SetTitle("Clusters per Track");
 	h_cdphi_data_electrons_inclusive_B1->Draw();
-	h_cdphi_cocktail_multback_B1->Draw("hist,same");
-	h_cdphi_data_hadrons_B1->Draw("hist,same");
+	h_cdphi_cocktail_multback_B1_scaled->Draw("hist,same");
+	h_cdphi_data_hadrons_B1_scaled->Draw("hist,same");
 
 	TLegend *legB1 = new TLegend(FIT_HIGH, 0.6, 0.65, 0.8);
 	legB1->SetLineColor(kWhite);
 	legB1->AddEntry(h_cdphi_data_electrons_inclusive_B1, "Inclusive Electrons - Swapped Electrons", "P");
-	legB1->AddEntry(h_cdphi_cocktail_multback_B1, "Photonic Component with HM Background", "L");
-	legB1->AddEntry(h_cdphi_data_hadrons_B1, "Non-Photonic Background", "L");
+	legB1->AddEntry(h_cdphi_cocktail_multback_B1_scaled, "Photonic Component with HM Background", "L");
+	legB1->AddEntry(h_cdphi_data_hadrons_B1_scaled, "Non-Photonic Background", "L");
 	legB1->Draw("same");
 
 	TLatex *tlB1 = new TLatex(0.68, 0.73, "B1");
@@ -1353,11 +1331,12 @@ void plotFitComponents()
 	tlB1->Draw("same");
 
 	//Verify integrals
-	int binLow = h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(-0.14);
-	int binHigh = h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(0.14);
-	cout << "DATA INTEGRAL B0 = " << h_cdphi_data_electrons_inclusive_B0->Integral(binLow, binHigh) << endl;
-	cout << "PHOT INTEGRAL B0 = " << h_cdphi_cocktail_multback_B0->Integral(binLow, binHigh) << endl;
-	cout << "NPHO INTEGRAL B0 = " << h_cdphi_data_hadrons_B0->Integral(binLow, binHigh) << endl;
+	int binLow = h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(-0.15);
+	int binHigh = h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(0.15);
+
+	float areaData = 0.0;
+	float areaP    = 0.0;
+	float areaNP   = 0.0;
 }
 
 
@@ -1607,6 +1586,11 @@ void integrateFNP()
 	cout << "FNP Through Integration" << endl << endl;
 	cout << "FNP B0 = " << fnp_b0 << endl;
 	cout << "FNP B1 = " << fnp_b1 << endl;
+	cout << " " << endl;
+	cout << " " << endl;
+	cout << " --> Data Integral B0          = " << nd_b0 << endl;
+	cout << " --> NP Integral B0 x FNP      = " << nnp_b0 * fnp_b0 << endl;
+	cout << " --> P Integral B0 x (1-FNP)   = " << np_b0 *(1.0 - fnp_b0) << endl;
 	cout << "---------------------------------------" << endl << endl;
 }
 
@@ -1699,6 +1683,15 @@ void constructFitVisualization()
 
 	h_cdphi_cocktail_multback_B0_scaled->Scale(1.0 - fnp_B0);
 	h_cdphi_cocktail_multback_B1_scaled->Scale(1.0 - fnp_B1);
+
+	//--------------------------------------------
+	// As a check, take integral of distributions
+	//--------------------------------------------
+
+	//cout << "---> NON PHOTONIC = " << h_cdphi_data_hadrons_B0_scaled->Integral(h_cdphi_data_hadrons_B0_scaled->GetXaxis()->FindBin(-0.14), h_cdphi_data_hadrons_B0_scaled->GetXaxis()->FindBin(0.14)) << endl;
+	//cout << "---> PHOTONIC     = " << h_cdphi_cocktail_multback_B0_scaled->Integral(h_cdphi_cocktail_multback_B0_scaled->GetXaxis()->FindBin(-0.14), h_cdphi_cocktail_multback_B0_scaled->GetXaxis()->FindBin(0.14)) << endl;
+	//cout << "---> DATA         = " << h_cdphi_data_electrons_inclusive_B0->Integral(h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(-0.14), h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(0.14)) << endl << endl;
+
 
 	//Define aesthetics
 	h_cdphi_cocktail_multback_B0_scaled->SetFillColorAlpha(kAzure, 0.2);
@@ -2319,7 +2312,7 @@ void calculateFNP()
 	gStyle->SetOptStat(0);
 	//plotElectronsData();
 	plotClustersPerHadronTrack();
-	plotFitComponents();
+	//plotFitComponents();
 	plotFitStacked();
 	plotPhotonicComponentWithoutBackground();
 	//plotPhotonicReweighted();

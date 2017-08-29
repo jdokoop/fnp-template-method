@@ -19,7 +19,7 @@ bool savePlots = false;
 const int REBINF = 8;
 
 //Reject points near peak for fit?
-bool reject = true;
+bool reject = !true;
 
 //Reject sparse bins?
 bool rejectSparse = !true;
@@ -29,6 +29,11 @@ bool smooth = true;
 
 //Simulated particle cocktail to use
 int cocktailNumber = 82717;
+
+//Add full underlying event, or only uncorrelated part?
+// 0 = Uncorrelated only
+// 1 = Full
+int underlyingEventType = 1;
 
 //Limits for fitting data CDPHI
 const float FIT_LOW = -0.15;
@@ -722,59 +727,7 @@ void fitPhotonicSideband()
 
 	//----------B0-------------
 
-	if (pTBin == 2)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "0.97*([0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x))", fitLowPos, fitHighPos);
-
-		//f_pos_cdphi_B0->SetParameter(0, 8.62982e+09);
-		//f_pos_cdphi_B0->SetParameter(1, -4.65486e+01);
-		//f_pos_cdphi_B0->SetParameter(2, 2.33832e+09);
-		//f_pos_cdphi_B0->SetParameter(3, -2.04280e+01);
-		//The seeded parameters above lead to the following parameters
-		f_pos_cdphi_B0->FixParameter(0, 6.13712e+09);
-		f_pos_cdphi_B0->FixParameter(1, -5.53696e+01);
-		f_pos_cdphi_B0->FixParameter(2, 5.54047e+08);
-		f_pos_cdphi_B0->FixParameter(3, -1.85779e+01);
-	}
-	else if (pTBin == 3)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-
-		f_pos_cdphi_B0->SetParameter(0, 7.63E8);
-		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
-		f_pos_cdphi_B0->SetParameter(2, 4.62747);
-		f_pos_cdphi_B0->SetParameter(3, 79.7595);
-	}
-	else if (pTBin == 4)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-
-		f_pos_cdphi_B0->SetParameter(0, h_cdphi_cocktail_B0_copy->GetMaximum());
-		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
-		f_pos_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
-		f_pos_cdphi_B0->SetParameter(3, -3.81166e+00);
-	}
-	else if (pTBin == 5)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-		f_pos_cdphi_B0->SetParameter(0, 2.24691e+07);
-		f_pos_cdphi_B0->SetParameter(1, -7.68560e+01);
-		f_pos_cdphi_B0->SetParameter(2, 5.12410e+05);
-		f_pos_cdphi_B0->SetParameter(3, -1.64956e+01);
-	}
-	else if (pTBin == 6)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "1.2*[0]*TMath::Exp([1]*x) + 1.2*[2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-
-		f_pos_cdphi_B0->FixParameter(0, 2.54E06);
-		f_pos_cdphi_B0->FixParameter(1, -44.3022);
-		f_pos_cdphi_B0->FixParameter(2, 1.09225E06);
-		f_pos_cdphi_B0->FixParameter(3, -55.046);
-	}
-
-	h_cdphi_cocktail_B0_copy->Fit(f_pos_cdphi_B0, "Q0R");
-
-	//Fit negative tail
+//Fit negative tail
 	f_neg_cdphi_B0 = new TF1("f_neg_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowNeg, fitHighNeg);
 
 	if (pTBin == 2)
@@ -814,6 +767,66 @@ void fitPhotonicSideband()
 		f_neg_cdphi_B0->SetParameter(3, 2.80063e+01);
 	}
 	h_cdphi_cocktail_B0_copy->Fit(f_neg_cdphi_B0, "Q0R");
+
+
+	if (pTBin == 2)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "0.97*([0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x))", fitLowPos, fitHighPos);
+
+		//f_pos_cdphi_B0->SetParameter(0, 8.62982e+09);
+		//f_pos_cdphi_B0->SetParameter(1, -4.65486e+01);
+		//f_pos_cdphi_B0->SetParameter(2, 2.33832e+09);
+		//f_pos_cdphi_B0->SetParameter(3, -2.04280e+01);
+		//The seeded parameters above lead to the following parameters
+		f_pos_cdphi_B0->FixParameter(0, 6.13712e+09);
+		f_pos_cdphi_B0->FixParameter(1, -5.53696e+01);
+		f_pos_cdphi_B0->FixParameter(2, 5.54047e+08);
+		f_pos_cdphi_B0->FixParameter(3, -1.85779e+01);
+	}
+	else if (pTBin == 3)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+
+		f_pos_cdphi_B0->SetParameter(0, 7.57858e+08);
+		f_pos_cdphi_B0->SetParameter(1, -4.20945e+01);
+		f_pos_cdphi_B0->SetParameter(2, 1.09447e+07);
+		f_pos_cdphi_B0->SetParameter(3, -2.80776e+03);
+
+		/*
+		f_pos_cdphi_B0->SetParameter(0, 7.63E8);
+		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
+		f_pos_cdphi_B0->SetParameter(2, 4.62747);
+		f_pos_cdphi_B0->SetParameter(3, 62.224);
+		*/
+	}
+	else if (pTBin == 4)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+
+		f_pos_cdphi_B0->SetParameter(0, h_cdphi_cocktail_B0_copy->GetMaximum());
+		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
+		f_pos_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
+		f_pos_cdphi_B0->SetParameter(3, -3.81166e+00);
+	}
+	else if (pTBin == 5)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+		f_pos_cdphi_B0->SetParameter(0, 2.24691e+07);
+		f_pos_cdphi_B0->SetParameter(1, -7.68560e+01);
+		f_pos_cdphi_B0->SetParameter(2, 5.12410e+05);
+		f_pos_cdphi_B0->SetParameter(3, -1.64956e+01);
+	}
+	else if (pTBin == 6)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "1.2*[0]*TMath::Exp([1]*x) + 1.2*[2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+
+		f_pos_cdphi_B0->FixParameter(0, 2.54E06);
+		f_pos_cdphi_B0->FixParameter(1, -44.3022);
+		f_pos_cdphi_B0->FixParameter(2, 1.09225E06);
+		f_pos_cdphi_B0->FixParameter(3, -55.046);
+	}
+
+	h_cdphi_cocktail_B0_copy->Fit(f_pos_cdphi_B0, "R");
 
 
 	//----------B1-------------
@@ -863,7 +876,7 @@ void fitPhotonicSideband()
 	f_neg_cdphi_B1 = new TF1("f_neg_cdphi_B1", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowNeg, fitHighNeg);
 
 	if (pTBin == 2)
-	{		
+	{
 		f_neg_cdphi_B1->SetParameter(0, 1.56974e+08);
 		f_neg_cdphi_B1->SetParameter(1, 5.77122e+01);
 		f_neg_cdphi_B1->SetParameter(2, 1.74885e+06 );
@@ -899,7 +912,7 @@ void fitPhotonicSideband()
 		f_neg_cdphi_B1->SetParameter(3, 3.49565e+00);
 	}
 
-	h_cdphi_cocktail_B1_copy->Fit(f_neg_cdphi_B1, "R");
+	h_cdphi_cocktail_B1_copy->Fit(f_neg_cdphi_B1, "Q0R");
 
 
 	//Make a copy of photonic cdphi before smoothing out the tails
@@ -1058,6 +1071,7 @@ void constructMultiplicityBackground()
 }
 */
 
+
 void constructMultiplicityBackground()
 {
 	//Get the distributions of clusters per charged hadron track
@@ -1096,7 +1110,8 @@ void constructMultiplicityBackground()
 
 	for (int i = binlow; i < binhigh; i++)
 	{
-		numClusterPerHadronTrackB0 += f_multiplicitybackground_B0->Eval(h_cdphi_cluspertrack_hadrons_B0->GetBinCenter(i));
+		if(underlyingEventType == 0) numClusterPerHadronTrackB0 += f_multiplicitybackground_B0->Eval(h_cdphi_cluspertrack_hadrons_B0->GetBinCenter(i));
+		if(underlyingEventType == 1) numClusterPerHadronTrackB0 += h_cdphi_cluspertrack_hadrons_B0->GetBinContent(i);
 	}
 
 	binlow  = h_cdphi_cluspertrack_hadrons_B1->GetXaxis()->FindBin(FIT_LOW);
@@ -1105,7 +1120,8 @@ void constructMultiplicityBackground()
 
 	for (int i = binlow; i < binhigh; i++)
 	{
-		numClusterPerHadronTrackB1 += f_multiplicitybackground_B1->Eval(h_cdphi_cluspertrack_hadrons_B1->GetBinCenter(i));
+		if(underlyingEventType == 0) numClusterPerHadronTrackB1 += f_multiplicitybackground_B1->Eval(h_cdphi_cluspertrack_hadrons_B1->GetBinCenter(i));
+		if(underlyingEventType == 1) numClusterPerHadronTrackB1 += h_cdphi_cluspertrack_hadrons_B1->GetBinContent(i);
 	}
 
 	cout << " Clusters per Hadron Track B0 = " << numClusterPerHadronTrackB0 << endl;
@@ -1139,7 +1155,9 @@ void constructMultiplicityBackground()
 			cout << "... Processing " << (float) i * 100 / numExtraClusB0 << "%" << endl;
 		}
 
-		float cdphi = f_multiplicitybackground_B0->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B0->GetRandom();
+		float cdphi = 0.0;
+		if(underlyingEventType == 0) cdphi = f_multiplicitybackground_B0->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B0->GetRandom();
+		if(underlyingEventType == 1) cdphi = h_cdphi_cluspertrack_hadrons_B0->GetRandom();
 		int bin = h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(cdphi);
 
 		if (pTBin < 4)
@@ -1159,7 +1177,9 @@ void constructMultiplicityBackground()
 			cout << "... Processing " << (float) i * 100 / numExtraClusB1 << "%" << endl;
 		}
 
-		float cdphi = f_multiplicitybackground_B1->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B1->GetRandom();
+		float cdphi = 0.0;
+		if(underlyingEventType == 0) cdphi = f_multiplicitybackground_B1->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B1->GetRandom();
+		if(underlyingEventType == 1) cdphi = h_cdphi_cluspertrack_hadrons_B1->GetRandom();
 		int bin = h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(cdphi);
 
 		if (pTBin < 4)
@@ -2301,7 +2321,6 @@ void calculateFNP()
 
 	constructMultiplicityBackground();
 	normalizeHistograms();
-	//addPhotonicErrorToData();
 
 	integrateFNP();
 	fitFNP();

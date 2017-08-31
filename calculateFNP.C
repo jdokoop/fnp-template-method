@@ -42,7 +42,7 @@ const float EXCLUDE_LOW = -0.03;
 const float EXCLUDE_HIGH = 0.005;
 
 //pT bin to compute FNP
-int pTBin = 3;
+int pTBin = 2;
 
 float pTLow = -9999;
 float pTHigh = -9999;
@@ -727,67 +727,6 @@ void fitPhotonicSideband()
 
 	//----------B0-------------
 
-	if (pTBin == 2)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "0.97*([0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x))", fitLowPos, fitHighPos);
-
-		//f_pos_cdphi_B0->SetParameter(0, 8.62982e+09);
-		//f_pos_cdphi_B0->SetParameter(1, -4.65486e+01);
-		//f_pos_cdphi_B0->SetParameter(2, 2.33832e+09);
-		//f_pos_cdphi_B0->SetParameter(3, -2.04280e+01);
-		//The seeded parameters above lead to the following parameters
-		f_pos_cdphi_B0->FixParameter(0, 6.13712e+09);
-		f_pos_cdphi_B0->FixParameter(1, -5.53696e+01);
-		f_pos_cdphi_B0->FixParameter(2, 5.54047e+08);
-		f_pos_cdphi_B0->FixParameter(3, -1.85779e+01);
-	}
-	else if (pTBin == 3)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-
-		f_pos_cdphi_B0->FixParameter(0, 7.63E8);
-		f_pos_cdphi_B0->FixParameter(1, -42.32);
-		f_pos_cdphi_B0->FixParameter(2, 77.125);
-		f_pos_cdphi_B0->FixParameter(3, 62.21);
-
-		/*
-		f_pos_cdphi_B0->SetParameter(0, 1.90E9);
-		f_pos_cdphi_B0->SetParameter(1, -40.41);
-		f_pos_cdphi_B0->SetParameter(2, -1.17E9);
-		f_pos_cdphi_B0->SetParameter(3, -37.88);
-		*/
-
-		
-	}
-	else if (pTBin == 4)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-
-		f_pos_cdphi_B0->SetParameter(0, h_cdphi_cocktail_B0_copy->GetMaximum());
-		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
-		f_pos_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
-		f_pos_cdphi_B0->SetParameter(3, -3.81166e+00);
-	}
-	else if (pTBin == 5)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-		f_pos_cdphi_B0->SetParameter(0, 2.24691e+07);
-		f_pos_cdphi_B0->SetParameter(1, -7.68560e+01);
-		f_pos_cdphi_B0->SetParameter(2, 5.12410e+05);
-		f_pos_cdphi_B0->SetParameter(3, -1.64956e+01);
-	}
-	else if (pTBin == 6)
-	{
-		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "1.2*[0]*TMath::Exp([1]*x) + 1.2*[2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
-
-		f_pos_cdphi_B0->FixParameter(0, 2.54E06);
-		f_pos_cdphi_B0->FixParameter(1, -44.3022);
-		f_pos_cdphi_B0->FixParameter(2, 1.09225E06);
-		f_pos_cdphi_B0->FixParameter(3, -55.046);
-	}
-
-	h_cdphi_cocktail_B0_copy->Fit(f_pos_cdphi_B0, "Q0R");
-
 	//Fit negative tail
 	f_neg_cdphi_B0 = new TF1("f_neg_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowNeg, fitHighNeg);
 
@@ -829,9 +768,69 @@ void fitPhotonicSideband()
 	}
 	h_cdphi_cocktail_B0_copy->Fit(f_neg_cdphi_B0, "Q0R");
 
+	if (pTBin == 2)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "0.97*([0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x))", fitLowPos, fitHighPos);
+
+		//f_pos_cdphi_B0->SetParameter(0, 8.62982e+09);
+		//f_pos_cdphi_B0->SetParameter(1, -4.65486e+01);
+		//f_pos_cdphi_B0->SetParameter(2, 2.33832e+09);
+		//f_pos_cdphi_B0->SetParameter(3, -2.04280e+01);
+		//The seeded parameters above lead to the following parameters
+		f_pos_cdphi_B0->FixParameter(0, 6.13712e+09);
+		f_pos_cdphi_B0->FixParameter(1, -5.53696e+01);
+		f_pos_cdphi_B0->FixParameter(2, 5.54047e+08);
+		f_pos_cdphi_B0->FixParameter(3, -1.85779e+01);
+	}
+	else if (pTBin == 3)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+
+		f_pos_cdphi_B0->FixParameter(0, 7.63E8);
+		f_pos_cdphi_B0->FixParameter(1, -45.701);
+		f_pos_cdphi_B0->FixParameter(2, 77.125);
+		f_pos_cdphi_B0->FixParameter(3, 52.64);//52.64);
+
+		/*
+		f_pos_cdphi_B0->SetParameter(0, 1.90E9);
+		f_pos_cdphi_B0->SetParameter(1, -40.41);
+		f_pos_cdphi_B0->SetParameter(2, -1.17E9);
+		f_pos_cdphi_B0->SetParameter(3, -37.88);
+		*/
+
+		
+	}
+	else if (pTBin == 4)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+
+		f_pos_cdphi_B0->SetParameter(0, h_cdphi_cocktail_B0_copy->GetMaximum());
+		f_pos_cdphi_B0->SetParameter(1, -4.33578e+01);
+		f_pos_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
+		f_pos_cdphi_B0->SetParameter(3, -3.81166e+00);
+	}
+	else if (pTBin == 5)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+		f_pos_cdphi_B0->SetParameter(0, 2.24691e+07);
+		f_pos_cdphi_B0->SetParameter(1, -7.68560e+01);
+		f_pos_cdphi_B0->SetParameter(2, 5.12410e+05);
+		f_pos_cdphi_B0->SetParameter(3, -1.64956e+01);
+	}
+	else if (pTBin == 6)
+	{
+		f_pos_cdphi_B0 = new TF1("f_pos_cdphi_B0", "1.2*[0]*TMath::Exp([1]*x) + 1.2*[2]*TMath::Exp([3]*x)", fitLowPos, fitHighPos);
+
+		f_pos_cdphi_B0->FixParameter(0, 2.54E06);
+		f_pos_cdphi_B0->FixParameter(1, -44.3022);
+		f_pos_cdphi_B0->FixParameter(2, 1.09225E06);
+		f_pos_cdphi_B0->FixParameter(3, -55.046);
+	}
+
+	h_cdphi_cocktail_B0_copy->Fit(f_pos_cdphi_B0, "R");
+
 
 	//----------B1-------------
-
 	//Fit negative tail
 	f_neg_cdphi_B1 = new TF1("f_neg_cdphi_B1", "[0]*TMath::Exp([1]*x) + [2]*TMath::Exp([3]*x)", fitLowNeg, fitHighNeg);
 
@@ -921,7 +920,7 @@ void fitPhotonicSideband()
 		f_pos_cdphi_B1->FixParameter(3, -48.1219);
 	}
 
-	h_cdphi_cocktail_B1_copy->Fit(f_pos_cdphi_B1, "R");
+	h_cdphi_cocktail_B1_copy->Fit(f_pos_cdphi_B1, "Q0R");
 
 
 	//Make a copy of photonic cdphi before smoothing out the tails
@@ -1211,7 +1210,7 @@ void plotClustersPerHadronTrack()
 	h_cdphi_cluspertrack_hadrons_B0->GetYaxis()->SetTitle("Clusters per Track");
 	h_cdphi_cluspertrack_hadrons_B0->GetYaxis()->SetTitleOffset(1.3);
 	h_cdphi_cluspertrack_hadrons_B0->GetXaxis()->SetRangeUser(FIT_LOW, FIT_HIGH);
-	h_cdphi_cluspertrack_hadrons_B0->Draw();
+	h_cdphi_cluspertrack_hadrons_B0->Draw("hist");
 	f_multiplicitybackground_B0->Draw("same");
 
 	TLatex *tlB0 = new TLatex(0.15, 0.76, "B0");

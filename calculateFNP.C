@@ -290,14 +290,20 @@ void loadHistos()
 
 void setErrors()
 {
-	h_cdphi_data_electrons_B0->Sumw2();
-	h_cdphi_data_electrons_B1->Sumw2();
+	//In order to facilitate the FNP fit, add a minimal error to every bin in the data electron distribution
+	for (int ibin = 1; ibin <= h_cdphi_data_electrons_inclusive_B0->GetNbinsX(); ibin++)
+	{
+		float current_error_B0 = h_cdphi_data_electrons_inclusive_B0->GetBinError(ibin);
+		float current_error_B1 = h_cdphi_data_electrons_inclusive_B1->GetBinError(ibin);
+		float cdphi = h_cdphi_data_electrons_B0->GetBinCenter(ibin);
 
-	//h_cdphi_data_electrons_swapped_B0->Sumw2();
-	//h_cdphi_data_electrons_swapped_B1->Sumw2();
-
-	//h_cdphi_data_hadrons_B0->Sumw2();
-	//h_cdphi_data_hadrons_B1->Sumw2();
+		if (cdphi > 0 && cdphi < 0.05)
+		{
+			h_cdphi_data_electrons_inclusive_B0->SetBinError(ibin, 1.5 * current_error_B0);
+			h_cdphi_data_electrons_inclusive_B1->SetBinError(ibin, 1.5 * current_error_B1);
+		}
+		//cout << h_cdphi_data_electrons_B0->GetBinCenter(ibin) << "    " << current_error_B0 / h_cdphi_data_electrons_B0->GetBinContent(ibin) << endl;
+	}
 }
 
 /*
@@ -798,7 +804,7 @@ void fitPhotonicSideband()
 		f_pos_cdphi_B0->SetParameter(3, -37.88);
 		*/
 
-		
+
 	}
 	else if (pTBin == 4)
 	{
@@ -1118,8 +1124,8 @@ void constructMultiplicityBackground()
 
 	for (int i = binlow; i < binhigh; i++)
 	{
-		if(underlyingEventType == 0) numClusterPerHadronTrackB0 += f_multiplicitybackground_B0->Eval(h_cdphi_cluspertrack_hadrons_B0->GetBinCenter(i));
-		if(underlyingEventType == 1) numClusterPerHadronTrackB0 += h_cdphi_cluspertrack_hadrons_B0->GetBinContent(i);
+		if (underlyingEventType == 0) numClusterPerHadronTrackB0 += f_multiplicitybackground_B0->Eval(h_cdphi_cluspertrack_hadrons_B0->GetBinCenter(i));
+		if (underlyingEventType == 1) numClusterPerHadronTrackB0 += h_cdphi_cluspertrack_hadrons_B0->GetBinContent(i);
 	}
 
 	binlow  = h_cdphi_cluspertrack_hadrons_B1->GetXaxis()->FindBin(FIT_LOW);
@@ -1128,8 +1134,8 @@ void constructMultiplicityBackground()
 
 	for (int i = binlow; i < binhigh; i++)
 	{
-		if(underlyingEventType == 0) numClusterPerHadronTrackB1 += f_multiplicitybackground_B1->Eval(h_cdphi_cluspertrack_hadrons_B1->GetBinCenter(i));
-		if(underlyingEventType == 1) numClusterPerHadronTrackB1 += h_cdphi_cluspertrack_hadrons_B1->GetBinContent(i);
+		if (underlyingEventType == 0) numClusterPerHadronTrackB1 += f_multiplicitybackground_B1->Eval(h_cdphi_cluspertrack_hadrons_B1->GetBinCenter(i));
+		if (underlyingEventType == 1) numClusterPerHadronTrackB1 += h_cdphi_cluspertrack_hadrons_B1->GetBinContent(i);
 	}
 
 	cout << " Clusters per Hadron Track B0 = " << numClusterPerHadronTrackB0 << endl;
@@ -1164,8 +1170,8 @@ void constructMultiplicityBackground()
 		}
 
 		float cdphi = 0.0;
-		if(underlyingEventType == 0) cdphi = f_multiplicitybackground_B0->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B0->GetRandom();
-		if(underlyingEventType == 1) cdphi = h_cdphi_cluspertrack_hadrons_B0->GetRandom();
+		if (underlyingEventType == 0) cdphi = f_multiplicitybackground_B0->GetRandom(FIT_LOW, FIT_HIGH); //h_cdphi_cluspertrack_hadrons_B0->GetRandom();
+		if (underlyingEventType == 1) cdphi = h_cdphi_cluspertrack_hadrons_B0->GetRandom();
 		int bin = h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(cdphi);
 
 		if (pTBin < 4)
@@ -1186,8 +1192,8 @@ void constructMultiplicityBackground()
 		}
 
 		float cdphi = 0.0;
-		if(underlyingEventType == 0) cdphi = f_multiplicitybackground_B1->GetRandom(FIT_LOW, FIT_HIGH);//h_cdphi_cluspertrack_hadrons_B1->GetRandom();
-		if(underlyingEventType == 1) cdphi = h_cdphi_cluspertrack_hadrons_B1->GetRandom();
+		if (underlyingEventType == 0) cdphi = f_multiplicitybackground_B1->GetRandom(FIT_LOW, FIT_HIGH); //h_cdphi_cluspertrack_hadrons_B1->GetRandom();
+		if (underlyingEventType == 1) cdphi = h_cdphi_cluspertrack_hadrons_B1->GetRandom();
 		int bin = h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(cdphi);
 
 		if (pTBin < 4)
@@ -2317,7 +2323,6 @@ void calculateFNP()
 {
 	//Do analysis
 	loadHistos();
-	setErrors();
 	removeSwappedBackground();
 	getNumTracks();
 	rebinHistos();
@@ -2329,6 +2334,7 @@ void calculateFNP()
 
 	constructMultiplicityBackground();
 	normalizeHistograms();
+	setErrors();
 
 	integrateFNP();
 	fitFNP();

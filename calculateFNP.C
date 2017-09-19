@@ -711,10 +711,17 @@ void fitPhotonicSideband()
 
 	if (pTBin == 2)
 	{
+		/*
 		f_neg_cdphi_B0->SetParameter(0, h_cdphi_cocktail_B0_copy->GetMaximum());
 		f_neg_cdphi_B0->SetParameter(1, 1.54722e+02);
 		f_neg_cdphi_B0->SetParameter(2, h_cdphi_cocktail_B0_copy->GetMaximum());
 		f_neg_cdphi_B0->SetParameter(3, 2.80063e+01);
+		*/
+
+		f_neg_cdphi_B0->FixParameter(0, 5.40527E8);
+		f_neg_cdphi_B0->FixParameter(1, 78.9981);
+		f_neg_cdphi_B0->FixParameter(2, 2.33118E08);
+		f_neg_cdphi_B0->FixParameter(3, 41.9945);
 	}
 	else if (pTBin == 3)
 	{
@@ -799,7 +806,7 @@ void fitPhotonicSideband()
 		f_pos_cdphi_B0->SetParameter(3, -55.046);
 	}
 
-	h_cdphi_cocktail_B0_copy->Fit(f_pos_cdphi_B0, "R");
+	h_cdphi_cocktail_B0_copy->Fit(f_pos_cdphi_B0, "Q0R");
 
 
 	//----------B1-------------
@@ -855,10 +862,17 @@ void fitPhotonicSideband()
 
 	if (pTBin == 2)
 	{
+		/*
 		f_pos_cdphi_B1->SetParameter(0, 6.89994e+08);
 		f_pos_cdphi_B1->SetParameter(1, -23.0516);
 		f_pos_cdphi_B1->SetParameter(2, 3.23243e+09);
 		f_pos_cdphi_B1->SetParameter(3, -56.2);
+		*/
+
+		f_pos_cdphi_B1->FixParameter(0, 1.10569E8);
+		f_pos_cdphi_B1->FixParameter(1, -9.94316);
+		f_pos_cdphi_B1->FixParameter(2, 1.12789E10);
+		f_pos_cdphi_B1->FixParameter(3, -53.5497);
 	}
 	else if (pTBin == 3)
 	{
@@ -900,7 +914,7 @@ void fitPhotonicSideband()
 		f_pos_cdphi_B1->SetParameter(3, -48.1219);
 	}
 
-	h_cdphi_cocktail_B1_copy->Fit(f_pos_cdphi_B1, "Q0R");
+	h_cdphi_cocktail_B1_copy->Fit(f_pos_cdphi_B1, "QR");
 
 
 	//Make a copy of photonic cdphi before smoothing out the tails

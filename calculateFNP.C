@@ -28,7 +28,7 @@ bool rejectSparse = !true;
 bool smooth = true;
 
 //Simulated particle cocktail to use
-int cocktailNumber = 82717;
+int cocktailNumber = 91817;//82717;//90417;
 
 //Add full underlying event, or only uncorrelated part?
 // 0 = Uncorrelated only
@@ -42,7 +42,7 @@ const float EXCLUDE_LOW = -0.03;
 const float EXCLUDE_HIGH = 0.005;
 
 //pT bin to compute FNP
-int pTBin = 2;
+int pTBin = 5;
 
 float pTLow = -9999;
 float pTHigh = -9999;
@@ -299,8 +299,8 @@ void setErrors()
 
 		if (cdphi > 0 && cdphi < 0.05)
 		{
-			h_cdphi_data_electrons_inclusive_B0->SetBinError(ibin, 1.5 * current_error_B0);
-			h_cdphi_data_electrons_inclusive_B1->SetBinError(ibin, 1.5 * current_error_B1);
+			//h_cdphi_data_electrons_inclusive_B0->SetBinError(ibin, 2.0 * current_error_B0);
+			//h_cdphi_data_electrons_inclusive_B1->SetBinError(ibin, 2.0 * current_error_B1);
 		}
 		//cout << h_cdphi_data_electrons_B0->GetBinCenter(ibin) << "    " << current_error_B0 / h_cdphi_data_electrons_B0->GetBinContent(ibin) << endl;
 	}
@@ -467,87 +467,60 @@ void rebinHistos()
 	                              0.1898,
 	                              0.1998
 	                            };
-
 	h_cdphi_B0_pizeros = (TH1D*) h_cdphi_B0_pizeros->Rebin(nbins, "h_cdphi_B0_pizeros_rebinned", binsVar);
 	h_cdphi_B1_pizeros = (TH1D*) h_cdphi_B1_pizeros->Rebin(nbins, "h_cdphi_B1_pizeros_rebinned", binsVar);
-
 	h_cdphi_B0_etas = (TH1D*) h_cdphi_B0_etas->Rebin(nbins, "h_cdphi_B0_etas_rebinned", binsVar);
 	h_cdphi_B1_etas = (TH1D*) h_cdphi_B1_etas->Rebin(nbins, "h_cdphi_B1_etas_rebinned", binsVar);
-
 	h_cdphi_B0_photons = (TH1D*) h_cdphi_B0_photons->Rebin(nbins, "h_cdphi_B0_photons_rebinned", binsVar);
 	h_cdphi_B1_photons = (TH1D*) h_cdphi_B1_photons->Rebin(nbins, "h_cdphi_B1_photons_rebinned", binsVar);
-
 	h_cdphi_counter_B0_pizeros = (TH1D*) h_cdphi_counter_B0_pizeros->Rebin(nbins, "h_cdphi_counter_B0_pizeros_rebinned", binsVar);
 	h_cdphi_counter_B1_pizeros = (TH1D*) h_cdphi_counter_B1_pizeros->Rebin(nbins, "h_cdphi_counter_B1_pizeros_rebinned", binsVar);
-
 	h_cdphi_counter_B0_etas = (TH1D*) h_cdphi_counter_B0_etas->Rebin(nbins, "h_cdphi_counter_B0_etas_rebinned", binsVar);
 	h_cdphi_counter_B1_etas = (TH1D*) h_cdphi_counter_B1_etas->Rebin(nbins, "h_cdphi_counter_B1_etas_rebinned", binsVar);
-
 	h_cdphi_counter_B0_photons = (TH1D*) h_cdphi_counter_B0_photons->Rebin(nbins, "h_cdphi_counter_B0_photons_rebinned", binsVar);
 	h_cdphi_counter_B1_photons = (TH1D*) h_cdphi_counter_B1_photons->Rebin(nbins, "h_cdphi_counter_B1_photons_rebinned", binsVar);
-
 	h_cdphi_data_electrons_B0 = (TH1D*) h_cdphi_data_electrons_B0->Rebin(nbins, "h_cdphi_data_electrons_B0_rebinned", binsVar);
 	h_cdphi_data_electrons_B1 = (TH1D*) h_cdphi_data_electrons_B1->Rebin(nbins, "h_cdphi_data_electrons_B1_rebinned", binsVar);
-
 	h_cdphi_data_electrons_cr_B0 = (TH1D*) h_cdphi_data_electrons_selfcorr_B0->Rebin(nbins, "h_cdphi_data_electrons_selfcorr_B0_rebinned", binsVar);
 	h_cdphi_data_electrons_selfcorr_B1 = (TH1D*) h_cdphi_data_electrons_selfcorr_B1->Rebin(nbins, "h_cdphi_data_electrons_selfcorr_B1_rebinned", binsVar);
-
 	h_cdphi_data_electrons_swapped_B0 = (TH1D*) h_cdphi_data_electrons_swapped_B0->Rebin(nbins, "h_cdphi_data_electrons_swapped_B0_rebinned", binsVar);
 	h_cdphi_data_electrons_swapped_B1 = (TH1D*) h_cdphi_data_electrons_swapped_B1->Rebin(nbins, "h_cdphi_data_electrons_swapped_B1_rebinned", binsVar);
-
 	h_cdphi_data_selfcorr_electrons_swapped_B0 = (TH1D*) h_cdphi_data_selfcorr_electrons_swapped_B0->Rebin(nbins, "h_cdphi_data_selfcorr_electrons_swapped_B0_rebinned", binsVar);
 	h_cdphi_data_selfcorr_electrons_swapped_B1 = (TH1D*) h_cdphi_data_selfcorr_electrons_swapped_B1->Rebin(nbins, "h_cdphi_data_selfcorr_electrons_swapped_B1_rebinned", binsVar);
-
 	h_cdphi_data_hadrons_B0 = (TH1D*) h_cdphi_data_hadrons_B0->Rebin(nbins, "h_cdphi_data_hadrons_B0_rebinned", binsVar);
 	h_cdphi_data_hadrons_B1 = (TH1D*) h_cdphi_data_hadrons_B1->Rebin(nbins, "h_cdphi_data_hadrons_B1_rebinned", binsVar);
-
 	h_cdphi_data_selfcorr_hadrons_B0 = (TH1D*) h_cdphi_data_selfcorr_hadrons_B0->Rebin(nbins, "h_cdphi_data_selfcorr_hadrons_B0_rebinned", binsVar);
 	h_cdphi_data_selfcorr_hadrons_B1 = (TH1D*) h_cdphi_data_selfcorr_hadrons_B1->Rebin(nbins, "h_cdphi_data_selfcorr_hadrons_B1_rebinned", binsVar);
-
 	h_cdphi_data_electrons_inclusive_B0 = (TH1D*) h_cdphi_data_electrons_inclusive_B0->Rebin(nbins, "h_cdphi_data_electrons_inclusive_B0_rebinned", binsVar);
 	h_cdphi_data_electrons_inclusive_B1 = (TH1D*) h_cdphi_data_electrons_inclusive_B1->Rebin(nbins, "h_cdphi_data_electrons_inclusive_B1_rebinned", binsVar);
-
 	//Scale by the bin width
 	for (int i = 1; i <= h_cdphi_B0_pizeros->GetNbinsX(); i++)
 	{
 	  if (i > 15 && i <= 40) continue;
-
 	  h_cdphi_B0_pizeros->SetBinContent(i, h_cdphi_B0_pizeros->GetBinContent(i) / 2.5);
 	  h_cdphi_B1_pizeros->SetBinContent(i, h_cdphi_B1_pizeros->GetBinContent(i) / 2.5);
-
 	  h_cdphi_B0_etas->SetBinContent(i, h_cdphi_B0_etas->GetBinContent(i) / 2.5);
 	  h_cdphi_B1_etas->SetBinContent(i, h_cdphi_B1_etas->GetBinContent(i) / 2.5);
-
 	  h_cdphi_B0_photons->SetBinContent(i, h_cdphi_B0_photons->GetBinContent(i) / 2.5);
 	  h_cdphi_B1_photons->SetBinContent(i, h_cdphi_B1_photons->GetBinContent(i) / 2.5);
-
 	  h_cdphi_counter_B0_pizeros->SetBinContent(i, h_cdphi_counter_B0_pizeros->GetBinContent(i) / 2.5);
 	  h_cdphi_counter_B1_pizeros->SetBinContent(i, h_cdphi_counter_B1_pizeros->GetBinContent(i) / 2.5);
-
 	  h_cdphi_counter_B0_etas->SetBinContent(i, h_cdphi_counter_B0_etas->GetBinContent(i) / 2.5);
 	  h_cdphi_counter_B1_etas->SetBinContent(i, h_cdphi_counter_B1_etas->GetBinContent(i) / 2.5);
-
 	  h_cdphi_counter_B0_photons->SetBinContent(i, h_cdphi_counter_B0_photons->GetBinContent(i) / 2.5);
 	  h_cdphi_counter_B1_photons->SetBinContent(i, h_cdphi_counter_B1_photons->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_electrons_B0->SetBinContent(i, h_cdphi_data_electrons_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_electrons_B1->SetBinContent(i, h_cdphi_data_electrons_B1->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_electrons_selfcorr_B0->SetBinContent(i, h_cdphi_data_electrons_selfcorr_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_electrons_selfcorr_B1->SetBinContent(i, h_cdphi_data_electrons_selfcorr_B1->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_electrons_swapped_B0->SetBinContent(i, h_cdphi_data_electrons_swapped_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_electrons_swapped_B1->SetBinContent(i, h_cdphi_data_electrons_swapped_B1->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_selfcorr_electrons_swapped_B0->SetBinContent(i, h_cdphi_data_selfcorr_electrons_swapped_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_selfcorr_electrons_swapped_B1->SetBinContent(i, h_cdphi_data_selfcorr_electrons_swapped_B1->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_hadrons_B0->SetBinContent(i, h_cdphi_data_hadrons_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_hadrons_B1->SetBinContent(i, h_cdphi_data_hadrons_B1->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_selfcorr_hadrons_B0->SetBinContent(i, h_cdphi_data_selfcorr_hadrons_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_selfcorr_hadrons_B1->SetBinContent(i, h_cdphi_data_selfcorr_hadrons_B1->GetBinContent(i) / 2.5);
-
 	  h_cdphi_data_electrons_inclusive_B0->SetBinContent(i, h_cdphi_data_electrons_inclusive_B0->GetBinContent(i) / 2.5);
 	  h_cdphi_data_electrons_inclusive_B1->SetBinContent(i, h_cdphi_data_electrons_inclusive_B1->GetBinContent(i) / 2.5);
 	}
@@ -978,57 +951,44 @@ void constructMultiplicityBackground()
 	//Get the distributions of clusters per charged hadron track
 	h_cdphi_cluspertrack_hadrons_B0 = (TH1D*) h_cdphi_data_hadrons_B0->Clone("h_cdphi_cluspertrack_hadrons_B0");
 	h_cdphi_cluspertrack_hadrons_B1 = (TH1D*) h_cdphi_data_hadrons_B1->Clone("h_cdphi_cluspertrack_hadrons_B1");
-
 	h_cdphi_cluspertrack_hadrons_B0->Scale(1.0 / numHadronsB0);
 	h_cdphi_cluspertrack_hadrons_B1->Scale(1.0 / numHadronsB1);
-
 	//Fit with a triangular function excluding the peak (peak defined as |cdphi| < 0.04)
 	TF1 *f_multiplicitybackground_aux_B0 = new TF1("f_multiplicitybackground_aux_B0", "(x<-0.04)*([0]*x) + (x>0.04)*([1]*x) + (x<-0.04 || x>0.04)*[2]", -0.15, 0.15);
 	h_cdphi_cluspertrack_hadrons_B0->Fit(f_multiplicitybackground_aux_B0, "Q0R");
-
 	TF1 *f_multiplicitybackground_aux_B1 = new TF1("f_multiplicitybackground_aux_B1", "(x<-0.04)*([0]*x) + (x>0.04)*([1]*x) + (x<-0.04 || x>0.04)*[2]", -0.15, 0.15);
 	h_cdphi_cluspertrack_hadrons_B1->Fit(f_multiplicitybackground_aux_B1, "Q0R");
-
 	//Extrapolate the fit functions to the peak region
 	f_multiplicitybackground_B0 = new TF1("f_multiplicitybackground_B0", "(x<0)*([0]*x + [2]) + (x>=0)*([1]*x + [2])", -0.15, 0.15);
 	f_multiplicitybackground_B0->SetParameter(0, f_multiplicitybackground_aux_B0->GetParameter(0));
 	f_multiplicitybackground_B0->SetParameter(1, f_multiplicitybackground_aux_B0->GetParameter(1));
 	f_multiplicitybackground_B0->SetParameter(2, f_multiplicitybackground_aux_B0->GetParameter(2));
-
 	f_multiplicitybackground_B1 = new TF1("f_multiplicitybackground_B1", "(x<0)*([0]*x + [2]) + (x>=0)*([1]*x + [2])", -0.15, 0.15);
 	f_multiplicitybackground_B1->SetParameter(0, f_multiplicitybackground_aux_B1->GetParameter(0));
 	f_multiplicitybackground_B1->SetParameter(1, f_multiplicitybackground_aux_B1->GetParameter(1));
 	f_multiplicitybackground_B1->SetParameter(2, f_multiplicitybackground_aux_B1->GetParameter(2));
-
 	//Determine the number of clusters per hadron track within the cdphi region of interest
 	numClusterPerHadronTrackB0 = 0;
 	int binlow  = h_cdphi_cluspertrack_hadrons_B0->GetXaxis()->FindBin(FIT_LOW);
 	int binhigh = h_cdphi_cluspertrack_hadrons_B0->GetXaxis()->FindBin(FIT_HIGH);
-
 	for (int i = binlow; i < binhigh; i++)
 	{
 		numClusterPerHadronTrackB0 += f_multiplicitybackground_B0->Eval(h_cdphi_cluspertrack_hadrons_B0->GetBinCenter(i));
 	}
-
 	binlow  = h_cdphi_cluspertrack_hadrons_B1->GetXaxis()->FindBin(FIT_LOW);
 	binhigh = h_cdphi_cluspertrack_hadrons_B1->GetXaxis()->FindBin(FIT_HIGH);
 	numClusterPerHadronTrackB1 = 0;
-
 	for (int i = binlow; i < binhigh; i++)
 	{
 		numClusterPerHadronTrackB1 += f_multiplicitybackground_B1->Eval(h_cdphi_cluspertrack_hadrons_B1->GetBinCenter(i));
 	}
-
 	cout << " Clusters per Hadron Track B0 = " << numClusterPerHadronTrackB0 << endl;
 	cout << " Clusters per Hadron Track B1 = " << numClusterPerHadronTrackB1 << endl << endl;
-
 	//Add clusters to photonic electron cocktail to account for underlying event multiplicity background
 	h_cdphi_cocktail_multback_B0 = (TH1D*) h_cdphi_cocktail_B0->Clone("h_cdphi_cocktail_multback_B0");
 	h_cdphi_cocktail_multback_B1 = (TH1D*) h_cdphi_cocktail_B1->Clone("h_cdphi_cocktail_multback_B1");
-
 	long int numExtraClusB0 = 0;
 	long int numExtraClusB1 = 0;
-
 	if (pTBin < 3)
 	{
 		numExtraClusB0 = TMath::Floor(numClusterPerHadronTrackB0 * numPhotonicElectrons / 100);
@@ -1039,20 +999,16 @@ void constructMultiplicityBackground()
 		numExtraClusB0 = numClusterPerHadronTrackB0 * numPhotonicElectrons;
 		numExtraClusB1 = numClusterPerHadronTrackB1 * numPhotonicElectrons;
 	}
-
 	cout << "--> Adding " << numExtraClusB0 << " clusters to photonic electron CDPHI in B0" << endl;
 	cout << "--> Adding " << numExtraClusB1 << " clusters to photonic electron CDPHI in B1" << endl << endl;
-
 	for (int i = 0; i < numExtraClusB0; i++)
 	{
 		if (i % 5000000 == 0)
 		{
 			cout << "... Processing " << (float) i * 100 / numExtraClusB0 << "%" << endl;
 		}
-
 		float cdphi = f_multiplicitybackground_B0->GetRandom(FIT_LOW, FIT_HIGH);
 		int bin = h_cdphi_cocktail_multback_B0->GetXaxis()->FindBin(cdphi);
-
 		if (pTBin < 3)
 		{
 			h_cdphi_cocktail_multback_B0->SetBinContent(bin, h_cdphi_cocktail_multback_B0->GetBinContent(bin) + 100.0);
@@ -1062,17 +1018,14 @@ void constructMultiplicityBackground()
 			h_cdphi_cocktail_multback_B0->SetBinContent(bin, h_cdphi_cocktail_multback_B0->GetBinContent(bin) + 1.0);
 		}
 	}
-
 	for (int i = 0; i < numExtraClusB1; i++)
 	{
 		if (i % 5000000 == 0)
 		{
 			cout << "... Processing " << (float) i * 100 / numExtraClusB1 << "%" << endl;
 		}
-
 		float cdphi = f_multiplicitybackground_B1->GetRandom(FIT_LOW, FIT_HIGH);
 		int bin = h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(cdphi);
-
 		if (pTBin < 3)
 		{
 			h_cdphi_cocktail_multback_B1->SetBinContent(bin, h_cdphi_cocktail_multback_B1->GetBinContent(bin) + 100.0);
@@ -1598,16 +1551,13 @@ void integrateFNP()
 		//Get the bins for integration
 		int bin1 = h_cdphi_data_electrons_inclusive_B0->GetXaxis()->FindBin(-0.15);
 		int bin2 = h_cdphi_data_electrons_inclusive_B1->GetXaxis()->FindBin(0.15);
-
 		//First, integrate the measured CDPHI distribution to get the total number of clusters per track in data
 		//Make sure that the histogram is properly normalized by the total number of tracks
 		double nd_b0 = h_cdphi_data_electrons_inclusive_B0->Integral(bin1, bin2);
 		double nd_b1 = h_cdphi_data_electrons_inclusive_B1->Integral(bin1, bin2);
-
 		//Now, integrate the CDPHI distribution for the photonic component with the underlying event background added
 		double np_b0 = h_cdphi_cocktail_multback_B0->Integral(bin1, bin2);
 		double np_b1 = h_cdphi_cocktail_multback_B1->Integral(bin1, bin2);
-
 		//Finally, integrate CDPHI distribution for charged hadrons in data (non-photonic contribution)
 		double nnp_b0 = h_cdphi_data_hadrons_B0->Integral(bin1, bin2);
 		double nnp_b1 = h_cdphi_data_hadrons_B1->Integral(bin1, bin2);

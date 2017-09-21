@@ -19,7 +19,7 @@ bool savePlots = false;
 const int REBINF = 8;
 
 //Reject points near peak for fit?
-bool reject = !true;
+bool reject = true;
 
 //Reject sparse bins?
 bool rejectSparse = !true;
@@ -38,11 +38,11 @@ int underlyingEventType = 0;
 //Limits for fitting data CDPHI
 const float FIT_LOW = -0.15;
 const float FIT_HIGH = 0.15;
-const float EXCLUDE_LOW = -0.03;
-const float EXCLUDE_HIGH = 0.005;
+const float EXCLUDE_LOW = -0.15;//-0.03;//
+const float EXCLUDE_HIGH = 0.007;//0.005;//
 
 //pT bin to compute FNP
-int pTBin = 2;
+int pTBin = 3;
 
 float pTLow = -9999;
 float pTHigh = -9999;
@@ -876,10 +876,18 @@ void fitPhotonicSideband()
 	}
 	else if (pTBin == 3)
 	{
+		/*
 		f_pos_cdphi_B1->SetParameter(0, 6.89994e+08);
 		f_pos_cdphi_B1->SetParameter(1, -23.0516);
 		f_pos_cdphi_B1->SetParameter(2, 3.23243e+09);
 		f_pos_cdphi_B1->SetParameter(3, -56.2);
+		*/
+		
+		
+		f_pos_cdphi_B1->FixParameter(0, 1.88195E8);
+		f_pos_cdphi_B1->FixParameter(1, -23.1257);
+		f_pos_cdphi_B1->FixParameter(2, 3.80412E9);
+		f_pos_cdphi_B1->FixParameter(3, -92.0);
 	}
 	else if (pTBin == 4)
 	{
@@ -914,8 +922,7 @@ void fitPhotonicSideband()
 		f_pos_cdphi_B1->SetParameter(3, -48.1219);
 	}
 
-	h_cdphi_cocktail_B1_copy->Fit(f_pos_cdphi_B1, "QR");
-
+	h_cdphi_cocktail_B1_copy->Fit(f_pos_cdphi_B1, "R");
 
 	//Make a copy of photonic cdphi before smoothing out the tails
 	h_cdphi_cocktail_nosmoothing_B0 = (TH1D*) h_cdphi_cocktail_B0->Clone("h_cdphi_cocktail_nosmoothing_B0");

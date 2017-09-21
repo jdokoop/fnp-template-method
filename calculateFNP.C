@@ -19,7 +19,7 @@ bool savePlots = false;
 const int REBINF = 8;
 
 //Reject points near peak for fit?
-bool reject = true;
+bool reject = !true;
 
 //Reject sparse bins?
 bool rejectSparse = !true;
@@ -27,13 +27,16 @@ bool rejectSparse = !true;
 //Smooth out sideband with template fit?
 bool smooth = true;
 
+//Scale the NP peak by a free parameter?
+bool scalePeak = true;
+
 //Simulated particle cocktail to use
 int cocktailNumber = 91817;//82717;//90417;
 
 //Add full underlying event, or only uncorrelated part?
 // 0 = Uncorrelated only
 // 1 = Full
-int underlyingEventType = 0;
+int underlyingEventType = 1;
 
 //Limits for fitting data CDPHI
 const float FIT_LOW = -0.15;
@@ -42,7 +45,7 @@ const float EXCLUDE_LOW = -0.15;//-0.03;//
 const float EXCLUDE_HIGH = 0.007;//0.005;//
 
 //pT bin to compute FNP
-int pTBin = 3;
+int pTBin = 2;
 
 float pTLow = -9999;
 float pTHigh = -9999;
@@ -353,6 +356,68 @@ double fitFunctionB1(double *cdphi, double *par)
 	double val = 0;
 
 	val = (1 - a) * h_cdphi_cocktail_multback_B1->GetBinContent(bin) + a * h_cdphi_data_hadrons_B1->GetBinContent(bin);
+
+	return val;
+}
+
+
+/*
+ * Fit function for B0 using free parameter to scale the peak of the NP distribution
+ */
+double fitFunctionB0ScaledPeak(double *cdphi, double *par)
+{
+	if (cdphi[0] < EXCLUDE_HIGH && cdphi[0] > EXCLUDE_LOW && reject)
+	{
+		TF1::RejectPoint();
+		return 0.0;
+	}
+
+	double a = par[0]; //FNP
+	double b = par[1];
+
+	int bin = h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(cdphi[0]);
+
+	double val = 0;
+
+	if (TMath::Abs(cdphi[0]) > 0.04)
+	{
+		val = (1 - a) * h_cdphi_cocktail_multback_B0->GetBinContent(bin) + a * h_cdphi_data_hadrons_B0->GetBinContent(bin);
+	}
+	else
+	{
+		val = (1 - a) * h_cdphi_cocktail_multback_B0->GetBinContent(bin) + a * h_cdphi_data_hadrons_B0->GetBinContent(bin) + b * h_cdphi_data_hadrons_B0->GetBinContent(bin);
+	}
+
+	return val;
+}
+
+
+/*
+ * Fit function for B1 using free parameter to scale the peak of the NP distribution
+ */
+double fitFunctionB1ScaledPeak(double *cdphi, double *par)
+{
+	if (cdphi[0] < EXCLUDE_HIGH && cdphi[0] > EXCLUDE_LOW && reject)
+	{
+		TF1::RejectPoint();
+		return 0.0;
+	}
+
+	double a = par[0]; //FNP
+	double b = par[1];
+
+	int bin = h_cdphi_cocktail_multback_B1->GetXaxis()->FindBin(cdphi[0]);
+
+	double val = 0;
+
+	if (TMath::Abs(cdphi[0]) > 0.04)
+	{
+		val = (1 - a) * h_cdphi_cocktail_multback_B1->GetBinContent(bin) + a * h_cdphi_data_hadrons_B1->GetBinContent(bin);
+	}
+	else
+	{
+		val = (1 - a) * h_cdphi_cocktail_multback_B1->GetBinContent(bin) + a * h_cdphi_data_hadrons_B1->GetBinContent(bin) + b * h_cdphi_data_hadrons_B1->GetBinContent(bin);
+	}
 
 	return val;
 }
@@ -882,8 +947,8 @@ void fitPhotonicSideband()
 		f_pos_cdphi_B1->SetParameter(2, 3.23243e+09);
 		f_pos_cdphi_B1->SetParameter(3, -56.2);
 		*/
-		
-		
+
+
 		f_pos_cdphi_B1->FixParameter(0, 1.88195E8);
 		f_pos_cdphi_B1->FixParameter(1, -23.1257);
 		f_pos_cdphi_B1->FixParameter(2, 3.80412E9);
@@ -1601,11 +1666,98 @@ void integrateFNP()
 }
 
 
+/*
+ * Fit the cdphi distribution of inclusive electrons with a combination of photonic and non-photonic components
+ * using FNP as the only free parameter
+ */
+void fitFNP()
+{
+	if (scalePeak)
+	{
+		fFitB0 = new TF1("fFitB0", fitFunctionB0ScaledPeak, FIT_LOW, FIT_HIGH, 2);
+		fFitB1 = new TF1("fFitB1", fitFunctionB1ScaledPeak, FIT_LOW, FIT_HIGH, 2);
+
+		//fFitB0->SetParLimits(1, 0.0, 0.1);
+		//fFitB1->SetParLimits(1, 0.0, 0.1);
+	}
+	else
+	{
+		fFitB0 = new TF1("fFitB0", fitFunctionB0, FIT_LOW, FIT_HIGH, 1);
+		fFitB1 = new TF1("fFitB1", fitFunctionB1, FIT_LOW, FIT_HIGH, 1);
+	}
+
+	fFitB0->SetParLimits(0, 0.0, 1.0);
+	fFitB1->SetParLimits(0, 0.0, 1.0);
+
+	h_cdphi_data_electrons_inclusive_B0->Fit(fFitB0, "Q0R");
+	h_cdphi_data_electrons_inclusive_B1->Fit(fFitB1, "Q0R");
+
+	fnp_B0 = fFitB0->GetParameter(0);
+	fnp_B1 = fFitB1->GetParameter(0);
+
+	fnp_B0_err = fFitB0->GetParError(0);
+	fnp_B1_err = fFitB1->GetParError(0);
+
+	cout << "--> FNP_B0 = " << fnp_B0 << " ± " << fnp_B0_err << endl;
+	cout << "--> FNP_B1 = " << fnp_B1 << " ± " << fnp_B1_err << endl << endl;
+	if(scalePeak)
+	{
+	 cout << "--> PEAK_0 = " << fFitB0->GetParameter(1) << " ± " << fFitB0->GetParError(1) << endl;
+	 cout << "--> PEAK_1 = " << fFitB1->GetParameter(1) << " ± " << fFitB1->GetParError(1) << endl << endl;
+	}
+
+	//Take ratio of data to fit
+	h_cdphi_data_ratio_B0 = (TH1D*) h_cdphi_data_electrons_inclusive_B0->Clone("h_cdphi_data_ratio_B0");
+	h_cdphi_data_ratio_B1 = (TH1D*) h_cdphi_data_electrons_inclusive_B1->Clone("h_cdphi_data_ratio_B1");
+	h_cdphi_data_ratio_B0->Reset();
+	h_cdphi_data_ratio_B1->Reset();
+
+	for (int i = 1; i < h_cdphi_data_ratio_B0->GetNbinsX(); i++)
+	{
+		float cdphi   = h_cdphi_data_ratio_B0->GetBinCenter(i);
+
+		float content;
+		if (cdphi >= EXCLUDE_LOW && cdphi <= EXCLUDE_HIGH && reject)
+		{
+			content = -9999;
+			h_cdphi_data_ratio_B0->SetBinContent(i, content);
+			h_cdphi_data_ratio_B0->SetBinError(i, 0.0);
+		}
+		else
+		{
+			content = h_cdphi_data_electrons_inclusive_B0->GetBinContent(i) / fFitB0->Eval(cdphi);
+			h_cdphi_data_ratio_B0->SetBinContent(i, content);
+			h_cdphi_data_ratio_B0->SetBinError(i, h_cdphi_data_electrons_inclusive_B0->GetBinError(i) / fFitB0->Eval(cdphi));
+		}
+	}
+
+	for (int i = 1; i < h_cdphi_data_ratio_B1->GetNbinsX(); i++)
+	{
+		float cdphi   = h_cdphi_data_ratio_B1->GetBinCenter(i);
+
+		float content;
+		if (cdphi >= EXCLUDE_LOW && cdphi <= EXCLUDE_HIGH && reject)
+		{
+			content = -9999;
+			h_cdphi_data_ratio_B1->SetBinContent(i, content);
+			h_cdphi_data_ratio_B1->SetBinError(i, 0.0);
+		}
+		else
+		{
+			content = h_cdphi_data_electrons_inclusive_B1->GetBinContent(i) / fFitB1->Eval(cdphi);
+			h_cdphi_data_ratio_B1->SetBinContent(i, content);
+			h_cdphi_data_ratio_B1->SetBinError(i, h_cdphi_data_electrons_inclusive_B1->GetBinError(i) / fFitB1->Eval(cdphi));
+		}
+	}
+}
+
+
 
 /*
  * Fit the cdphi distribution of inclusive electrons with a combination of photonic and non-photonic components
  * using FNP as the only free parameter
  */
+ /*
 void fitFNP()
 {
 	fFitB0 = new TF1("fFitB0", fitFunctionB0, FIT_LOW, FIT_HIGH, 1);
@@ -1670,6 +1822,7 @@ void fitFNP()
 		}
 	}
 }
+*/
 
 
 /*
